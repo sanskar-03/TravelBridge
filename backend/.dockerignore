@@ -1,0 +1,12 @@
+# Backend Docker Ignore
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+coverage/
+.venv/
+venv/
+*.sqlite3
+media/
+uploads/
+.env
