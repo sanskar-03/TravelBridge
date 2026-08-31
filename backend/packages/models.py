@@ -7,17 +7,18 @@ from travel.models import Location
 
 class PackageRequest(BaseModel):
     """
-    Represents a requester's need to transport an item.
+    Canonical model for a requester's need to transport an item.
     """
     class Status(models.TextChoices):
         DRAFT = 'DRAFT', 'Draft'
-        OPEN = 'OPEN', 'Open'
-        MATCHING = 'MATCHING', 'Matching'
+        PUBLISHED = 'PUBLISHED', 'Published'
+        PAUSED = 'PAUSED', 'Paused'
+        CANCELLED = 'CANCELLED', 'Cancelled'
+        EXPIRED = 'EXPIRED', 'Expired'
+        # Future states for matching/delivery
         MATCHED = 'MATCHED', 'Matched'
         IN_TRANSIT = 'IN_TRANSIT', 'In Transit'
         DELIVERED = 'DELIVERED', 'Delivered'
-        CANCELLED = 'CANCELLED', 'Cancelled'
-        DISPUTED = 'DISPUTED', 'Disputed'
 
     class ItemCategory(models.TextChoices):
         DOCUMENTS = 'DOC', 'Documents'
@@ -32,7 +33,6 @@ class PackageRequest(BaseModel):
     origin = models.ForeignKey(Location, on_delete=models.PROTECT, related_name='packages_from')
     destination = models.ForeignKey(Location, on_delete=models.PROTECT, related_name='packages_to')
     
-    requested_pickup_date = models.DateTimeField()
     required_delivery_date = models.DateTimeField(db_index=True)
     
     weight_kg = models.DecimalField(
@@ -41,19 +41,19 @@ class PackageRequest(BaseModel):
         validators=[MinValueValidator(Decimal('0.1'))]
     )
     
-    # Structured dimensions: Length x Width x Height in cm
-    length_cm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    width_cm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    height_cm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    length_cm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True, validators=[MinValueValidator(Decimal('0.1'))])
+    width_cm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True, validators=[MinValueValidator(Decimal('0.1'))])
+    height_cm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True, validators=[MinValueValidator(Decimal('0.1'))])
     
     category = models.CharField(max_length=3, choices=ItemCategory.choices, default=ItemCategory.OTHER)
-    description = models.TextField()
+    title = models.CharField(max_length=100)
+    description = models.TextField(max_length=1000)
     
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.DRAFT, db_index=True)
     
     class Meta:
         constraints = [
-            models.CheckConstraint(check=models.Q(weight_kg__gt=0), name='weight_must_be_positive'),
+            models.CheckConstraint(check=models.Q(weight_kg__gt=0), name='package_weight_must_be_positive'),
         ]
         indexes = [
             models.Index(fields=['status', 'required_delivery_date']),
@@ -61,4 +61,4 @@ class PackageRequest(BaseModel):
         ]
 
     def __str__(self):
-        return f"Package {self.id} | {self.origin} -> {self.destination}"
+        return f"Package {self.id} | {self.origin} -> {self.destination} ({self.status})"

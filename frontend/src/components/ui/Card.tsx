@@ -1,18 +1,7 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
-
-export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("rounded-lg border border-border bg-surface shadow-sm", className)} {...props} />
-}
-
-export function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("flex flex-col space-y-1.5 p-6", className)} {...props} />
-}
-
-export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
-  return <h3 className={cn("text-lg font-semibold leading-none tracking-tight", className)} {...props} />
-}
-
-export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("p-6 pt-0 text-text-secondary", className)} {...props} />
-}
+import React from 'react';
+export const Card = ({ children, className = '', title }: { children: React.ReactNode, className?: string, title?: string }) => (
+  <div className={`bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden ${className}`}>
+    {title && <div className="px-6 py-4 border-b border-slate-100 bg-slate-50 font-semibold text-slate-800">{title}</div>}
+    <div className="p-6">{children}</div>
+  </div>
+);

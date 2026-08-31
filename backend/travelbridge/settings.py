@@ -31,6 +31,17 @@ INSTALLED_APPS = [
     'users',
     'travel',
     'packages',
+    'proposals',
+    'payments',
+    'orders',
+    'tracking',
+    'notifications',
+    'chat',
+    'reviews',
+    'admin_panel',
+    'verifications',
+    'fraud',
+    'disputes',
     'rest_framework',
     'corsheaders',
 ]
@@ -148,6 +159,9 @@ AUTH_USER_MODEL = 'users.User'
 # REST FRAMEWORK & FIREBASE
 # ==========================================
 REST_FRAMEWORK = {
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '100/min',
+    },
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'users.authentication.FirebaseAuthentication',
     ],
@@ -159,3 +173,16 @@ REST_FRAMEWORK = {
 FIREBASE_PROJECT_ID = env('FIREBASE_PROJECT_ID', default='')
 FIREBASE_CLIENT_EMAIL = env('FIREBASE_CLIENT_EMAIL', default='')
 FIREBASE_PRIVATE_KEY = env('FIREBASE_PRIVATE_KEY', default='')
+
+# Part 20 Production Hardening Security Additions
+import os
+if not DEBUG:
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    CORS_ALLOW_ALL_ORIGINS = False
